@@ -100,7 +100,7 @@ def hunt() -> list[dict]:
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        browser = pw.chromium.launch(headless=False)
         context = browser.new_context(
             viewport={"width": 1280, "height": 900},
             user_agent=(
@@ -209,14 +209,9 @@ def hunt() -> list[dict]:
                         "pet_name": found_pet_name,
                         "price_eur": price
                     }
+                    # Collect item (alerts will be processed after hunt)
                     all_found_items.append(found_item)
                     hunt_count += 1
-
-                    # 5. Check Alert & Notify
-                    if price <= target_price:
-                        msg = f"HUNT SUCCESS: {found_pet_name} found for {price:.2f}€ (Target <= {target_price:.2f}€)"
-                        print(f"  [!!!] {msg}")
-                        send_alert(msg)
                 
                 if hunt_count == 0:
                     print(f"  [?] No results found for '{pet_name}'")
@@ -237,10 +232,51 @@ def main() -> None:
     print("  [*] Starpets.gg Targeted Hunt Scraper")
     print("=" * 60)
 
+    alerts = load_alerts()
     items = hunt()
 
     if items:
-        # Save to CSV
+        # 1. Smart Filtering Logic
+        # Convert alerts list to a lookup dict {name: max_price}
+        target_pets = {a['pet_name'].strip(): a['target_price'] for a in alerts if 'pet_name' in a}
+        
+        filtered_results = {}
+
+        for item in items:
+            name = item['pet_name']
+            price = item['price_eur']
+            
+            # Check if this pet is on the hunt list (using exact or partial match)
+            # To be safe and follow the user's requested 'if name in target_pets' logic:
+            matching_target = None
+            if name in target_pets:
+                matching_target = name
+            else:
+                # Fallback: check if the item name contains any of our target names
+                for target_name in target_pets:
+                    if target_name.lower() in name.lower():
+                        matching_target = target_name
+                        break
+            
+            if matching_target:
+                max_allowed = target_pets[matching_target]
+                if price <= max_allowed:
+                    # ONLY keep the lowest price for this specific full name found
+                    if name not in filtered_results or price < filtered_results[name]['price_eur']:
+                        filtered_results[name] = item
+
+        # 2. Send alerts only for the winners
+        if filtered_results:
+            print(f"\n[!] Smart Filter found {len(filtered_results)} deals to notify:")
+            for pet_name, best_deal in filtered_results.items():
+                price = best_deal['price_eur']
+                msg = f"🎯 FOUND: {pet_name} for {price:.2f}€! (Target <= {target_pets.get(pet_name, target_pets.get(matching_target, 'N/A'))}€)"
+                print(f"  [ALERT] {msg}")
+                send_alert(msg)
+        else:
+            print("\n[INFO] No items passed the smart filter criteria.")
+
+        # 3. Save to CSV (log everything found for history)
         append_to_csv(items)
         print(f"\n[SAVE] Logged {len(items)} listings to {CSV_PATH}")
     else:
@@ -251,4 +287,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
