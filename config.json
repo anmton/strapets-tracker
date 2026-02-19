@@ -1,14 +1,6 @@
 {
     "alerts": [
         {
-            "pet_name": "Unicorn",
-            "target_price": 1.0
-        },
-        {
-            "pet_name": "Dragon",
-            "target_price": 0.5
-        },
-        {
             "pet_name": "Giant panda",
             "target_price": 100.0
         }
