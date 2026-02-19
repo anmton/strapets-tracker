@@ -1,7 +1,16 @@
 {
-  "alerts": [
-    { "pet_name": "Unicorn", "target_price": 1.00 },
-    { "pet_name": "Dragon", "target_price": 0.50 },
-    { "pet_name": "Fly Potion", "target_price": 1.00 }
-  ]
+    "alerts": [
+        {
+            "pet_name": "Unicorn",
+            "target_price": 1.0
+        },
+        {
+            "pet_name": "Dragon",
+            "target_price": 0.5
+        },
+        {
+            "pet_name": "Fly Potion",
+            "target_price": 1.0
+        }
+    ]
 }
