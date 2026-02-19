@@ -1,25 +1,44 @@
 name: Hourly Hunter
+
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
+
 jobs:
   hunt:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - run: |
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # This ensures the robot sees the latest changes from your UI
+          fetch-depth: 0 
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
           pip install -r requirements.txt
           playwright install chromium
+          # This installs the system libraries needed for cloud browsers
+          playwright install-deps chromium 
+
       - name: Run Hunter
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python scraper.py
+
       - name: Save Results
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Robot: Prices Updated"
+          # This prevents the 'rejected main -> main' error
+          push_options: '--force'
+          # Only save the files that actually change
+          file_pattern: 'price_history.csv config.json screenshots/*.png'
