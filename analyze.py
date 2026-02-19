@@ -6,7 +6,7 @@ import os
 
 # --- 1. CONFIG (CENSOR ALERT) ---
 # Your GitHub repository path
-REPO_NAME = "your-github-username/starpets-tracker" 
+REPO_NAME = "anmton/starpets-tracker" 
 
 st.set_page_config(page_title="Starpets Hunter", page_icon="🎯")
 st.title("🎯 Starpets Target Manager")
@@ -98,3 +98,4 @@ if st.button("🚀 Update Hunter Robot", type="primary"):
         st.cache_data.clear()
     except Exception as e:
         st.error(f"Failed to update GitHub: {e}")
+
