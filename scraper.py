@@ -100,7 +100,7 @@ def hunt() -> list[dict]:
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        browser = pw.chromium.launch(headless=true)
         context = browser.new_context(
             viewport={"width": 1280, "height": 900},
             user_agent=(
@@ -287,4 +287,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
