@@ -1,0 +1,6 @@
+playwright>=1.40.0
+requests
+pandas
+PyGithub
+streamlit
+plotly
