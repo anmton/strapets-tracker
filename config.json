@@ -2,7 +2,7 @@
     "alerts": [
         {
             "pet_name": "Giant panda",
-            "target_price": 100.0
+            "target_price": 20.0
         }
     ]
 }
