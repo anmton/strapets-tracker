@@ -3,6 +3,10 @@
         {
             "pet_name": "Giant panda",
             "target_price": 10.0
+        },
+        {
+            "pet_name": "Haetae",
+            "target_price": 260.0
         }
     ]
 }
